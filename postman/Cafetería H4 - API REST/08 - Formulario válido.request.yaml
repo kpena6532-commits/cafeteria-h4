@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/contactos"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"nombre":"Cliente de prueba","email":"prueba@example.com","asunto":"Consulta","mensaje":"Hola, quiero consultar su horario de atención."}'
+scripts:
+  - type: afterResponse
+    code: pm.test('Guardado en MySQL', () => pm.response.to.have.status(201));
+    language: text/javascript
+order: 8000

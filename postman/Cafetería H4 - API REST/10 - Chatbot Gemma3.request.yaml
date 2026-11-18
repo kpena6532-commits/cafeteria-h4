@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/chatbot"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"prompt":"¿Cuánto cuesta el capuchino y dónde están ubicados?"}'
+scripts:
+  - type: afterResponse
+    code: pm.test('Responde con Gemma3', () => {pm.response.to.have.status(200);pm.expect(pm.response.json().response).to.be.a('string');});
+    language: text/javascript
+order: 10000

@@ -1,0 +1,47 @@
+@if (loading()) { <div class="state"><span class="loader"></span><p>Preparando tu café...</p></div> }
+@else if (error()) { <div class="state"><h2>Sin conexión</h2><p>{{error()}}</p><button class="btn gold" (click)="refresh()">REINTENTAR</button></div> }
+@else { @if (data(); as shop) {
+<header class="header">
+  <a class="brand" href="#inicio" (click)="closeMenu()"><span class="brand-mark">✺</span>{{c('nombre')}}</a>
+  <button class="hamburger" aria-label="Abrir navegación" (click)="menuOpen.set(!menuOpen())">☰</button>
+  <nav [class.open]="menuOpen()">
+    <a href="#inicio" (click)="closeMenu()">INICIO</a><a href="#servicios" (click)="closeMenu()">SERVICIOS</a>
+    <a href="#especialidades" (click)="closeMenu()">ESPECIALIDADES</a><a href="#nosotros" (click)="closeMenu()">NOSOTROS</a>
+    <a href="#precios" (click)="closeMenu()">PRECIOS</a><a href="#contacto" (click)="closeMenu()">CONTACTO</a>
+  </nav>
+</header>
+<main>
+  <section id="inicio" class="hero">
+    @if(c('video_inicio')) { <video class="hero-video" [src]="c('video_inicio')" autoplay muted loop playsinline preload="metadata" poster="https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1600"></video> }
+    <div class="hero-shade"></div>
+    <div class="hero-content wrap">
+      <p class="eyebrow"><span></span>{{c('ciudad')}}<span></span></p>
+      <h1>{{c('titulo_inicio')}}</h1>
+      <p class="hero-subtitle">{{c('subtitulo_inicio')}}</p>
+      <a class="btn gold" href="#precios">{{c('boton_inicio')}} <span>↗</span></a>
+    </div>
+    <div class="hero-side">HECHO CON PASIÓN · SERVIDO CON AMOR</div>
+    <div class="scroll-hint">DESLIZA PARA DESCUBRIR <span>↓</span></div>
+  </section>
+  <section id="servicios" class="section cream">
+    <div class="wrap"><div class="section-heading"><div><p class="kicker">LO QUE NOS HACE ESPECIALES</p><h2>{{c('titulo_servicios')}}</h2></div><p>Cada detalle está pensado para convertir una pausa en un gran momento.</p></div>
+      <div class="service-grid">@for(s of shop.servicios; track s.id) { @if(s.activo) {<article class="service-card"><span class="service-icon">{{s.icono}}</span><span class="service-number">0{{$index+1}}</span><h3>{{s.titulo}}</h3><p>{{s.descripcion}}</p></article>} }</div>
+    </div>
+  </section>
+  <section id="especialidades" class="section dark"><div class="wrap"><div class="center-heading"><p class="kicker">UNA SELECCIÓN PARA TI</p><h2>{{c('titulo_especialidades')}}</h2><p>Sabores que merecen repetirse.</p></div>
+    <div class="special-grid">@for(s of specialties();track s.id) { @if(s.producto;as p) {<article class="special-card"><div class="special-image"><img [src]="p.imagen" [alt]="p.nombre" loading="lazy"><span class="tag">{{s.etiqueta}}</span></div><div class="special-details"><div><h3>{{p.nombre}}</h3><p>{{p.descripcion}}</p></div><strong>Bs {{formatPrice(p)}}</strong></div></article>} }</div>
+  </div></section>
+  <section id="nosotros" class="section cream about"><div class="wrap about-grid"><div class="about-images"><img class="about-main" [src]="c('imagen_nosotros')" alt="Preparación de café" loading="lazy"><div class="about-stamp">☕<span>CAFÉ & MOMENTOS</span></div></div><div class="about-text"><p class="kicker">NUESTRA ESENCIA</p><h2>{{c('titulo_nosotros')}}</h2><p>{{c('historia')}}</p><div class="about-line"></div><p class="about-address">⌖ &nbsp; {{c('direccion')}}</p><a href="#contacto" class="text-link">VEN A CONOCERNOS <span>↗</span></a></div></div></section>
+  @if(shop.galeria.length){<div class="gallery">@for(g of shop.galeria;track g.id){<div><img [src]="g.imagen" [alt]="g.titulo" loading="lazy"></div>}</div>}
+  <section id="precios" class="section menu-section"><div class="wrap"><div class="center-heading"><p class="kicker">ELIGE TU FAVORITO</p><h2>{{c('titulo_precios')}}</h2><p>Preparados al momento, para disfrutar sin prisa.</p></div>
+    <div class="filters"><button [class.selected]="category()===0" (click)="category.set(0)">Todos</button>@for(cat of shop.categorias;track cat.id){<button [class.selected]="category()===cat.id" (click)="category.set(cat.id)">{{cat.nombre}}</button>}</div>
+    <div class="product-grid">@for(p of products();track p.id){<article class="product"><img [src]="p.imagen" [alt]="p.nombre" loading="lazy"><div class="product-copy"><div class="product-title"><h3>{{p.nombre}}</h3><strong>Bs {{formatPrice(p)}}</strong></div><p>{{p.descripcion}}</p></div></article>}@empty{<p class="empty">No hay productos disponibles en esta categoría.</p>}</div>
+  </div></section>
+  <section id="contacto" class="section contact-section"><div class="wrap contact-grid"><div><p class="kicker">ESTAMOS CERCA DE TI</p><h2>{{c('titulo_contactos')}}</h2><p class="contact-intro">¿Una pregunta, una sugerencia o ganas de visitarnos? Escríbenos.</p><div class="contact-detail"><span>⌖</span><div><b>ENCUÉNTRANOS</b><p>{{c('direccion')}}</p></div></div><div class="contact-detail"><span>☎</span><div><b>LLÁMANOS</b><p>{{c('telefono')}}</p></div></div><div class="contact-detail"><span>✉</span><div><b>ESCRÍBENOS</b><p>{{c('correo')}}</p></div></div><div class="hours"><b>HORARIOS DE ATENCIÓN</b>@for(h of shop.horarios;track h.id){<p><span>{{h.dias}}</span><span>{{h.horas}}</span></p>}</div></div>
+    <form class="contact-form" (ngSubmit)="sendContact()" #contactForm="ngForm"><h3>Déjanos un mensaje</h3><p>Nos encantará saber de ti.</p><label>Tu nombre<input [(ngModel)]="form.nombre" name="nombre" required minlength="2" maxlength="100" placeholder="Nombre completo"></label><label>Correo electrónico<input [(ngModel)]="form.email" name="email" type="email" required email maxlength="150" placeholder="ejemplo@correo.com"></label><label>Asunto<input [(ngModel)]="form.asunto" name="asunto" maxlength="150" placeholder="¿En qué podemos ayudarte?"></label><label>Tu mensaje<textarea [(ngModel)]="form.mensaje" name="mensaje" required minlength="10" maxlength="3000" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea></label><button class="btn gold" type="submit" [disabled]="contactForm.invalid || contactBusy()">{{contactBusy()?'ENVIANDO...':'ENVIAR MENSAJE ↗'}}</button>@if(contactStatus()){<p role="status" class="form-status">{{contactStatus()}}</p>}</form>
+  </div></section>
+</main>
+<footer class="footer"><div class="wrap footer-inner"><div><a href="#inicio" class="brand"><span class="brand-mark">✺</span>{{c('nombre')}}</a><p>{{c('pie_pagina')}}</p></div><p>{{c('ciudad')}}<br>© {{2026}} {{c('nombre')}}</p><a href="#inicio">VOLVER ARRIBA ↑</a></div></footer>
+<button class="chat-launch" [attr.aria-label]="chatOpen()?'Cerrar asistente':'Abrir asistente'" (click)="chatOpen.set(!chatOpen())">{{chatOpen()?'✕':'✦'}} <span>{{chatOpen()?'':'¿Te ayudo?'}}</span></button>
+@if(chatOpen()){<section class="chat-panel" aria-label="Chat de la cafetería"><div class="chat-head"><span>✦</span><div><strong>Asistente {{c('nombre')}}</strong><small>Con Gemma 3 · Ollama</small></div><button (click)="chatOpen.set(false)" aria-label="Cerrar">×</button></div><div class="chat-messages"><div class="bubble bot">¡Hola! Soy el asistente de {{c('nombre')}}. Pregúntame por precios, productos, horarios o nuestra dirección.</div>@for(m of conversation();track $index){<div class="bubble" [class.bot]="m.from==='bot'" [class.user]="m.from==='user'">{{m.text}}</div>}@if(chatBusy()){<div class="bubble bot">Preparando respuesta...</div>}</div><form class="chat-input" (ngSubmit)="sendChat()"><input [(ngModel)]="question" name="question" maxlength="700" placeholder="Escribe tu pregunta..." aria-label="Pregunta al asistente"><button [disabled]="chatBusy() || !question.trim()" aria-label="Enviar">➤</button></form></section>}
+} }

@@ -1,0 +1,4 @@
+$kind: collection
+description: Pruebas de lectura MySQL, formulario y chatbot Ollama. Ejecutar después de importar el esquema y seed.
+variables:
+  baseUrl: http://localhost:3000
